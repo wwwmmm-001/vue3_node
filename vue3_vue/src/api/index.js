@@ -11,7 +11,9 @@ export const getHeadImg=(path)=>{
     return requests(`/head/Image/?path=${path}`)
 }
 // 和风天气api
-
+export const getWeather=(address)=>{
+    return requestsForeign(`https://devapi.qweather.com/v7/weather/now?location=${address}&key=2a130ce8e05d4721b2d83a4c11287a16`)
+}
 // 微博热点
 export const getWeibo=()=>{
     return requestsForeign('https://tenapi.cn/resou/')

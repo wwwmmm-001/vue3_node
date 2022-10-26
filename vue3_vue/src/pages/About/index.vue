@@ -55,7 +55,7 @@
                 <li>                    
                     <hr><br>
                     <div class="four">
-                        <h3>源码</h3>
+                        <a href="https://github.com/wwwmmm-001/vue3_node" target="_blank">源码</a>
                     </div>
                 </li>
 
@@ -162,7 +162,18 @@ export default {
         .three {
             animation: oneInit 2s;
         }
-
+        .four{
+            animation: twoInit 2s;            
+            font-size: 1.2vw;
+            font-weight: 700;
+            a{
+                color: rgba(0, 0, 0, 0.6);
+                transition: all .2s;
+            }
+            a:hover{
+                color: rgb(45, 74, 238);
+            }
+        }
         @keyframes oneInit {
             from {
                 opacity: 0;

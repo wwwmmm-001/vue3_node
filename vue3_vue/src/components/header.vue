@@ -34,7 +34,7 @@
                 <div class="bottom">.</div>
             </router-link>
 
-            <router-link class="collect" to="/collect" :class="{ active: router_path == '/look' }">
+            <router-link class="collect" to="/collect" :class="{ active: router_path == '/collect' }">
                 <div class="top">收藏</div>
                 <div class="middle">
                     <el-icon>
@@ -44,8 +44,7 @@
                 <div class="bottom">.</div>
             </router-link>
 
-
-            <a class="About" :class="{ active: router_path == '/about' }">
+            <a class="About" :class="{ active: router_path == '/about' ||  router_path == '/leavemsg'}">
                 <div class="top">其它</div>
                 <div class="middle">
                     <el-icon>

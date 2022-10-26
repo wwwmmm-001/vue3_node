@@ -11,12 +11,14 @@
 import Header from '@/components/header.vue'
 import { computed, onMounted, onUnmounted, ref, provide } from 'vue'
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 export default {
   name: 'App',
   components: {
     Header,
   },
   setup() {
+    const store= useStore()
     let header = ref(null)
 
     // 当前屏幕距离顶部距离
@@ -73,8 +75,11 @@ export default {
 
     onMounted(() => {
       window.addEventListener('scroll', getNavigation)
-
       window.addEventListener('mousemove', showHeader)
+      // 获取天气
+      store.dispatch('basicMsg/GetWeather', 101271101)
+      // 获取热搜
+      store.dispatch('basicMsg/GetWeibo')
     })
     onUnmounted(() => {
       window.removeEventListener('scroll', getNavigation)

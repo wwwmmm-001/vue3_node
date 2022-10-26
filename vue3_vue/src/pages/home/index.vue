@@ -385,14 +385,8 @@ export default {
             }, 12)
             // 显示时间
             getTime()
-
             // 获取基本信息
             store.dispatch('basicMsg/GetBasicMsg')
-            // 获取天气
-            store.dispatch('basicMsg/GetWeather', 101271101)
-            // 获取热搜
-            store.dispatch('basicMsg/GetWeibo')
-
 
         })
         // 判断是否存在showhead mousemove事件
