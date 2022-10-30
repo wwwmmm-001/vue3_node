@@ -102,7 +102,7 @@ app.get('/head/Image', (req, res) => {
 app.get('/blogs/Image', (req, res) => {
     let Img_path = path.join(__dirname, 'blogs_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -110,27 +110,34 @@ app.get('/blogs/Image', (req, res) => {
 
 // 请求blogs初始化
 app.get('/blogs/init', (req, res) => {
-    const sql_select = 'select * from blogs order by id desc limit 0,6'
+    const sql_select = 'select * from blogs order by id desc'
     db.query(sql_select, (err, result) => {
         if (err) { console.log('文章初始化 err'); }
         else {
             let left = []
             let right = []
-            let head=[]
+            let head = []
+            let page=0
             for (let i = 0; i < result.length; i++) {
-                if(result[i].head){
+                if (result[i].head) {
                     head.push(result[i])
                 }
-                if (i % 2 == 0) left.push(result[i])
-                else right.push(result[i])
+                if (right.length < 3) {
+                    if (i % 2 == 0) left.push(result[i])
+                    else {
+                        right.push(result[i])
+                        page=result[i].id
+                    }
+                }
+                else if (right.length < 3 && head.length == 3) break
             }
             let data = {
-                page: result[result.length - 1].id,
+                page,
                 left,
                 right,
                 head
             }
-            setTimeout(() => res.send(data), 800)
+            res.send(data)
         }
     })
 })
@@ -144,7 +151,7 @@ app.get('/blogs', (req, res) => {
             if (result.length == 0) res.send({ status: 0 })
             else {
                 result.unshift(result[result.length - 1].id)
-                setTimeout(() => res.send(result), 350)
+                res.send(result)
             }
         }
     })
@@ -182,7 +189,7 @@ app.get('/LookImg', (req, res) => {
 app.get('/lookImg/Image', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_lookImg_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -202,7 +209,7 @@ app.get('/Look/head', (req, res) => {
 app.get('/Look/headImg', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_head_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -230,10 +237,7 @@ app.get('/Look/anime', (req, res) => {
                 val.name = (val.name).split('-=')
                 val.label = (val.label).split('-=')
             })
-            setTimeout(() => {
-                res.send(result)
-            }, 700)
-
+            res.send(result)
         }
 
     })
@@ -270,7 +274,7 @@ app.get('/Look/anime/detail', (req, res) => {
 app.get('/Look/animeImg', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_anime_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -289,7 +293,7 @@ app.get('/Look/video', (req, res) => {
 app.get('/Look/videoImg', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_video_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -308,7 +312,7 @@ app.get('/Look/eiga', (req, res) => {
 app.get('/Look/eigaImg', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_eiga_img', req.query.path)
     readFile(Img_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此图片')
     })
@@ -326,7 +330,7 @@ app.get('/home/musicList', (req, res) => {
 app.get('/home/music', (req, res) => {
     let music_path = path.join(__dirname, 'home_music', `${req.query.path}.mp3`)
     readFile(music_path).then((data) => {
-        setTimeout(() => res.send(data), 500)
+        res.send(data)
     }).catch((err) => {
         res.send('没有此music')
     })
