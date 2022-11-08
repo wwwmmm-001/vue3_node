@@ -14,15 +14,20 @@
                 <div class="bottom">.</div>
             </router-link>
 
-            <router-link class="Img" to="/lookImg" :class="{ active: router_path == '/lookImg' }">
-                <div class="top">图片</div>
+            <a class="Look_Music_About" :class="{ active: router_path == '/lookImg' || router_path == '/music' }">
+                <div class="top">视听</div>
                 <div class="middle">
                     <el-icon>
-                        <PictureFilled />
+                        <Opportunity />
                     </el-icon>
                 </div>
                 <div class="bottom">.</div>
-            </router-link>
+                <div class="other">
+                    <router-link to="/lookImg">图片</router-link>
+                    <router-link to="/music">音乐</router-link>
+                </div>
+
+            </a>
 
             <router-link class="Look" to="/look" :class="{ active: router_path == '/look' }">
                 <div class="top">放映</div>
@@ -38,13 +43,13 @@
                 <div class="top">收藏</div>
                 <div class="middle">
                     <el-icon>
-                        <Opportunity />
+                        <Briefcase />
                     </el-icon>
                 </div>
                 <div class="bottom">.</div>
             </router-link>
 
-            <a class="About" :class="{ active: router_path == '/about' ||  router_path == '/leavemsg'}">
+            <a class="Look_Music_About" :class="{ active: router_path == '/about' || router_path == '/leavemsg' }">
                 <div class="top">其它</div>
                 <div class="middle">
                     <el-icon>
@@ -116,11 +121,12 @@
                                 </el-icon>
                             </span>
                             <ul>
-                                <li v-for="(music, index) in musicList" :key="index" :title="music"
-                                    :class="{ musci_active_li: music_index == index }" @dblclick="list_play(index)">
+                                <li v-for="(music, index) in musicList" :key="music.id" :title="music.name"
+                                    :class="{ music_active_li: music_active_index.id == music.id }"
+                                    @dblclick="list_play(index)">
                                     <i
-                                        :class="{ musci_active_placeholder: true, musci_active: music_index == index }"></i>
-                                    <p>{{ music }}</p>
+                                        :class="{ musci_active_placeholder: true, musci_active: music_active_index.id == music.id }"></i>
+                                    <p>{{ music.name }} - {{ music.singer }}</p>
                                 </li>
 
                             </ul>
@@ -156,15 +162,14 @@ export default {
                 m < 10 ? m = '0' + m : m
                 nowTime.value = h + ':' + m
             }, 1000)
-
-            // 请求音乐列表
-            store.dispatch('header/GetMusicList')
             setVolume()
         })
 
         let router_path = computed(() => router.currentRoute.value.path)
-        watch(router_path, () => {
-            homeShowHeader('-105%')
+        watch(router_path, (newV) => {
+            window.scroll(0, 0);
+            if (newV == '/music')  homeShowHeader(0)            
+            else homeShowHeader('-105%')
         })
 
         let homeShowHeader = inject('homeShowHeader')
@@ -172,7 +177,14 @@ export default {
         // 判断music src请求是否返回
         let complete = 0
         function setComplete() {
+
             complete = 1
+            // 使用对象判断 是在哪个位置修改 header play传入-1  music play传入双击播放的index,id为歌曲id
+            let data = {
+                id: musicList.value[Refs.music_index].id,
+                play: '-1'
+            }
+            store.commit('eventbus/changeMusic_Active', data)
             if (!init_play) ClickPlay()
         }
 
@@ -180,7 +192,9 @@ export default {
         //#region 
         let init_play = 1
         function ClickPlay() {
+
             if (!complete) return
+            store.commit('eventbus/changePlay_Pause', 0)
             init_play = 0
             Refs.music.play()
             Refs.play.style.transform = 'translateY(-2.7vw)'
@@ -198,11 +212,14 @@ export default {
         function ClickRight(_, l_index = 0) {
             // 判断是否式 li_list内点击
             if (!l_index) play_index(1)
-            Refs.musicName = musicList.value[Refs.music_index]
-            complete = 0
-            let music = musicList.value[Refs.music_index]
-            music = music.replace('+', "%2B")
-            Refs.music.src = `/api/home/music?path=${music}`
+            else {
+                // 双击播放
+                Refs.musicName = `${musicList.value[Refs.music_index].singer} - ${musicList.value[Refs.music_index].name}`
+                complete = 0
+                let music_album = musicList.value[Refs.music_index].album
+                let music_name = musicList.value[Refs.music_index].name
+                Refs.music.src = `/api/home/music?path=${music_album}/${music_name}`
+            }
         }
         //#endregion
         // 是否播放完毕,切换下一首
@@ -235,11 +252,11 @@ export default {
                     last_index.push(Refs.music_index)
                 }
             }
-            Refs.musicName = musicList.value[Refs.music_index]
+            Refs.musicName = `${musicList.value[Refs.music_index].singer} - ${musicList.value[Refs.music_index].name}`
             complete = 0
-            let music = musicList.value[Refs.music_index]
-            music = music.replace('+', "%2B")
-            Refs.music.src = `/api/home/music?path=${music}`
+            let music_album = musicList.value[Refs.music_index].album
+            let music_name = musicList.value[Refs.music_index].name
+            Refs.music.src = `/api/home/music?path=${music_album}/${music_name}`
 
         }
 
@@ -253,8 +270,8 @@ export default {
         let timer_http_rank = 0
         timer_http_rank = watch(musicList, (newV) => {
             if (newV) {
-                Refs.music.src = `/api/home/music?path=${musicList.value[Refs.music_index]}`
-                Refs.musicName = musicList.value[0]
+                Refs.music.src = `/api/home/music?path=${musicList.value[Refs.music_index].album}/${musicList.value[Refs.music_index].name}`
+                Refs.musicName = `${musicList.value[0].singer} - ${musicList.value[0].name}`
                 timer_http_rank()
             }
         })
@@ -290,8 +307,9 @@ export default {
             if (timer_volume) { return }
             timer_volume = setTimeout(() => {
                 Refs.music.volume = (Refs.value1) / 100
+                store.commit('eventbus/change_Volume', Refs.music.volume)
                 timer_volume = 0
-            }, 12)
+            }, 10)
         }
 
         // 修改播放模式
@@ -330,10 +348,23 @@ export default {
             Refs.music_index = index
             ClickRight(0, 1)
         }
+        let music_active_index = computed(() => {
+            return store.state.eventbus.music_active
+        })
+        watch(music_active_index, (newV) => {
+            if (newV.play == '-1') return false
+            list_play(newV.play)
+        })
+        let eventbus_play_pause = computed(() => store.state.eventbus.play_pause)
+        watch(eventbus_play_pause, (newV) => {
+            if (newV) {
+                ClickPause()
+            }
+        })
 
         // 整合ref
         let Refs = shallowReactive({
-            value1: 50, // 音量
+            value1: 30, // 音量
             musicName: 'loading', // music Name
             // 当前播放music 索引
             music_index: 0,
@@ -361,6 +392,7 @@ export default {
             playMode,
             showMusicList,
             list_play,
+            music_active_index,
             ...toRefs(Refs)
         }
     }
@@ -378,6 +410,7 @@ export default {
     height: 100vh;
     transform: translateX(-105%);
     transition: all .4s;
+    border-radius: 0 15px 0 0;
 
     a {
         color: black;
@@ -429,6 +462,7 @@ export default {
 
             .playMode {
                 color: rgb(210, 210, 210);
+                transition: all .2s;
 
                 span {
                     display: inline-block;
@@ -445,18 +479,29 @@ export default {
                 }
             }
 
+            .playMode:hover {
+                color: aliceblue;
+                transform: scale(1.2, 1.2) translateY(-5%);
+            }
+
             .musicList {
                 i {
+                    transition: all .2s;
                     font-size: 1.2vw;
                     color: rgb(185, 185, 185);
+                }
+
+                i:hover {
+                    color: aliceblue;
+                    transform: scale(1.12, 1.12);
                 }
 
                 .musicList_close {
                     position: absolute;
                     right: 5px;
                     top: 0;
-                    background-color: rgba(43, 38, 38, 0.5);
-                    border-radius: 0 0 0 2px;
+                    background-color: rgba(80, 80, 80, 0.55);
+                    border-radius: 0 0 0 4px;
                     width: 0.9vw;
                     height: 0.9vw;
                     transition: all .2s;
@@ -504,7 +549,7 @@ export default {
                     // 滚动条颜色
                     ul::-webkit-scrollbar-thumb {
                         border-radius: 2px;
-                        background: rgba(112, 105, 105, 0.9);
+                        background: rgba(112, 105, 105, 0.3);
                     }
 
                     // 滚动处背景
@@ -522,7 +567,6 @@ export default {
                         color: rgb(18, 10, 10);
                         overflow-y: scroll;
                         overflow-x: hidden;
-
 
                         li {
                             height: 20%;
@@ -559,14 +603,14 @@ export default {
                             font-weight: 700;
                         }
 
-                        .musci_active_li {
+                        .music_active_li {
                             color: rgb(0, 138, 252);
                             font-weight: 700;
                         }
 
-                        li:nth-child(2n-1) {
+                        li:nth-child(2n) {
                             border-radius: 4px;
-                            background-color: rgb(200, 213, 218);
+                            background-color: rgb(218, 218, 218);
                         }
 
                         li:hover {
@@ -578,10 +622,15 @@ export default {
                         }
 
                     }
+
+                    ul:hover::-webkit-scrollbar-thumb {
+                        background: rgba(112, 105, 105, 0.8);
+                    }
                 }
 
 
             }
+
         }
 
         .el-icon {
@@ -766,31 +815,6 @@ export default {
         opacity: 0;
     }
 
-    .Img {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        font-size: 1vw;
-        font-weight: 600;
-        height: 20%;
-
-    }
-
-    .Img:hover .top {
-        transform: rotateX(0) translateY(95%);
-    }
-
-    .Img:hover .bottom {
-        transform: rotateX(0) translateY(-48%);
-    }
-
-    .Img:hover .middle {
-        opacity: 0;
-    }
-
     .Look {
         width: 100%;
         display: flex;
@@ -841,7 +865,7 @@ export default {
         opacity: 0;
     }
 
-    .About {
+    .Look_Music_About {
         width: 100%;
         display: flex;
         position: relative;
@@ -867,7 +891,7 @@ export default {
             box-shadow: 0 0 5px 1px #999;
             transform: translateX(-50%) scale(0.35, 0.1);
             opacity: 0;
-            transition: all .3s;
+            transition: all .2s;
             z-index: 10;
 
             a {
@@ -890,19 +914,19 @@ export default {
         }
     }
 
-    .About:hover .top {
+    .Look_Music_About:hover .top {
         transform: rotateX(0) translateY(100%);
     }
 
-    .About:hover .bottom {
+    .Look_Music_About:hover .bottom {
         transform: rotateX(0) translateY(-50%);
     }
 
-    .About:hover .middle {
+    .Look_Music_About:hover .middle {
         opacity: 0;
     }
 
-    .About:hover .other {
+    .Look_Music_About:hover .other {
         width: 5.5vw;
         transform: translateX(18%);
         opacity: 1;

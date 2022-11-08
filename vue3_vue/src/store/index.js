@@ -9,6 +9,8 @@ import editor from './Editor'
 import leaveMsg from './leaveMsg'
 import article from './article'
 import collect from './collect'
+import eventbus from './eventbus'
+import music from './music'
 export default createStore({
     modules:{
         login,
@@ -20,6 +22,8 @@ export default createStore({
         editor,
         leaveMsg,
         article,
-        collect
+        collect,
+        eventbus,
+        music
     }
 })

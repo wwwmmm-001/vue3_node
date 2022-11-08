@@ -51,6 +51,11 @@ const router = createRouter({
             meta: { title: '收藏' },
         },
         {
+            path:'/music',
+            component: ()=>import('@/pages/Music'),
+            meta: { title: '音乐' },
+        },
+        {
             path: '/',
             redirect: '/home'
         }
@@ -63,7 +68,7 @@ router.beforeEach((to, from, next) => {
 
 });
 router.afterEach(()=>{
-    document.documentElement.scrollTop = 0
+    // window.scrollTo(0,0)
     NProgress.done()
 })
 export default router;

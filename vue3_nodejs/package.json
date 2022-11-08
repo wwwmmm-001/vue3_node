@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "audio-loader": "^1.0.3",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "express": "^4.18.1",
+    "id3-reader": "^0.0.2",
     "image-size": "^1.0.2",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",

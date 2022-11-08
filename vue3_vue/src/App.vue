@@ -9,7 +9,7 @@
 
 <script>
 import Header from '@/components/header.vue'
-import { computed, onMounted, onUnmounted, ref, provide } from 'vue'
+import { computed, onMounted, ref, provide } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 export default {
@@ -18,7 +18,7 @@ export default {
     Header,
   },
   setup() {
-    const store= useStore()
+    const store = useStore()
     let header = ref(null)
 
     // 当前屏幕距离顶部距离
@@ -44,7 +44,7 @@ export default {
     let timer_header = 0
     let in_header = 0
     let out_header = 0
-    function showHeader(e) {
+    function showHeader(e) {  
       if (timer_header) return
       timer_header = setTimeout(() => {
         if (e.clientX < (header.value.children[0].clientWidth) / 8) {
@@ -57,12 +57,17 @@ export default {
         } else if (e.clientX > header.value.children[0].clientWidth * 1.4) {
           if (out_header == 0) {
             out_header = 1
-            in_header = 0
-            header.value.children[0].style.transform = 'translateX(-105%)'
+            in_header = 0   
+            // music解绑事件后,setInterval仍在运行   
+            if(router.currentRoute.value.path == '/music') {}
+            else{
+              header.value.children[0].style.transform = 'translateX(-105%)'
+            }
+            
           }
 
         }
-        timer_header = 0
+        timer_header = null
       }, 38)
 
     }
@@ -76,13 +81,15 @@ export default {
     onMounted(() => {
       window.addEventListener('scroll', getNavigation)
       window.addEventListener('mousemove', showHeader)
+      //APP.vue中
+      //刷新后回到顶部
+
       // 获取天气
       store.dispatch('basicMsg/GetWeather', 101271101)
       // 获取热搜
       store.dispatch('basicMsg/GetWeibo')
-    })
-    onUnmounted(() => {
-      window.removeEventListener('scroll', getNavigation)
+      // 请求音乐列表
+      store.dispatch('header/GetMusicList')
     })
 
     const router = useRouter()

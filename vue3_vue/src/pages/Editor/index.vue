@@ -108,7 +108,6 @@ export default {
         let timer = 0
         async function submitEditor() {
             if (timer) return
-            await store.dispatch('editor/GetEditorId')
             if (store.state.editor.editor_Id) {
                 timer = 1
                 files.id = store.state.editor.editor_Id
@@ -116,7 +115,22 @@ export default {
                 files.detail = title2.value
                 files.time = getTime()
                 files.path = `img${store.state.editor.editor_Id}`
+                content.value = content.value.replace(/'/g, "\\'")
                 files.content = content.value
+                for (let i in files) {
+                    if (files[i].length == 0) {
+                        ElMessage({
+                            showClose: true,
+                            message: '没有填写完整哦,2s后可重新提交',
+                            duration: 2000
+                        })
+                        setTimeout(()=>{
+                            timer = 0
+                        },2000)                        
+                        return
+                    }
+                }
+
                 let msg = ElMessage({
                     showClose: true,
                     message: '提交中,请稍等',
@@ -124,7 +138,7 @@ export default {
                 })
                 store.dispatch('editor/PostEditor', files).then((result) => {
                     msg.close()
-                    if (result) {
+                    if (result == '1') {
                         ElMessage({
                             showClose: true,
                             message: '提交成功',
@@ -135,10 +149,20 @@ export default {
                             timer = 0
                         }, 1000)
 
-                    } else {
+                    }
+                    else if (result == '2') {
                         ElMessage({
                             showClose: true,
-                            message: '提交失败',
+                            message: '数据库写入失败,可能存在需要转义特殊字符',
+                            duration: 3000,
+                            type: 'warning',
+                        })
+                        timer = 0
+                    }
+                    else if (result == '3') {
+                        ElMessage({
+                            showClose: true,
+                            message: '图片写入失败',
                             duration: 3000,
                             type: 'warning',
                         })
@@ -148,24 +172,21 @@ export default {
                 }).catch((err) => {
                     msg.close()
                     timer = 0
+                    console.log(err);
                     ElMessage({
                         showClose: true,
                         message: '提交失败',
                         duration: 3000,
                         type: 'warning',
                     })
-                    ElMessage({
-                        showClose: true,
-                        message: '可以检查下图片大小哦',
-                        duration: 2000,
-                    })
                 })
 
             } else {
+                store.dispatch('editor/GetEditorId')
                 ElMessage({
                     showClose: true,
-                    message: '没有获取编号',
-                    duration: 2500,
+                    message: '没有获取编号,正在重新发出请求',
+                    duration: 2000,
                     type: 'warning',
                 })
                 timer = 0

@@ -58,6 +58,14 @@ export const getLookEiga=()=>{
 export const getMusicList=()=>{
     return requests('/home/musicList')
 }
+// 请求music 唱片
+export const getAlbumList=()=>{
+    return requests('/music/list')
+}
+// 点击album,获取唱片内歌曲
+export const getAlbumMsgList=(val)=>{
+    return requests(`/music/album?album=${val}`)
+}
 // 获取blogs编写时 编号(用于提交)
 export const getEditorId=()=>{
     return requests('/getEditorId')
@@ -82,4 +90,8 @@ export const getCollect=()=>{
 // collect检索请求
 export const getCollectSearch=(val)=>{
     return requests.get(`/collect/search?search=${val}`)
+}
+// 添加/删除 歌曲后,将ID传给服务器
+export const postMusicID=(data)=>{
+    return requests.post(`/Music/change`,data)
 }

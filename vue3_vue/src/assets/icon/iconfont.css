@@ -1,8 +1,6 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 3726863 */
-  src: url('iconfont.woff2?t=1666623433909') format('woff2'),
-       url('iconfont.woff?t=1666623433909') format('woff'),
-       url('iconfont.ttf?t=1666623433909') format('truetype');
+  font-family: "iconfont"; /* Project id  */
+  src: url('iconfont.ttf?t=1667717130920') format('truetype');
 }
 
 .iconfont {
@@ -19,5 +17,41 @@
 
 .icon-bofang-xunhuanbofang:before {
   content: "\e68d";
+}
+
+.icon-play:before {
+  content: "\e98c";
+}
+
+.icon-pause:before {
+  content: "\e98f";
+}
+
+.icon-List-1:before {
+  content: "\e69e";
+}
+
+.icon-fangda-:before {
+  content: "\e60e";
+}
+
+.icon-shangyishou:before {
+  content: "\e604";
+}
+
+.icon-xiayishou:before {
+  content: "\e602";
+}
+
+.icon-triangle:before {
+  content: "\e61a";
+}
+
+.icon-fangda:before {
+  content: "\e650";
+}
+
+.icon-add-bold:before {
+  content: "\e685";
 }
 

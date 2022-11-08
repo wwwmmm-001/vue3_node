@@ -4,8 +4,8 @@
             <a class="one" @click="goDown">
                 <span>主页</span>
             </a>
-            <router-link class="two" to="/lookImg" target="_blank">
-                <span>图片</span>
+            <router-link class="two" to="/music" target="_blank">
+                <span>音乐</span>
             </router-link>
             <router-link class="three" to="/look" target="_blank">
                 <span>放映</span>
@@ -291,14 +291,12 @@ export default {
             let flex_opacity_minus = 1
             let flex_opacity_plus = 0
             let translateX = 0
-
             // 节流
             if (Timertimeout) { return false }
             else {
                 // 判断Timerinterval 动画是否存在 存在返回false
                 if (Timerinterval) { return false }
                 Timertimeout = setTimeout(() => {
-
                     if (newValue - window.innerHeight > -5 * vw) {
                         window.removeEventListener('mousemove', showHeader)
                         showHead_add = 0
@@ -307,7 +305,7 @@ export default {
                         goWrite.value.style.display = ' block '
                     }
                     else if (newValue - window.innerHeight < -10 * vw) {
-                        homeShowHeader('-105%')
+                        homeShowHeader('-105%')                        
                         window.addEventListener('mousemove', showHeader)
                         showHead_add = 1
                         goSearch.value.style.display = 'none'
@@ -361,8 +359,9 @@ export default {
                 }, 120)
             }
         })
-
+        // window.addEventListener('mousemove', showHeader) app初识化绑定的header鼠标移入显示事件
         let showHeader = inject('showHeader')
+        // 手动控制header的显示与否 0% -105%
         let homeShowHeader = inject('homeShowHeader')
 
         //#endregion

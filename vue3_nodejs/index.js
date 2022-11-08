@@ -9,7 +9,7 @@ const path = require('path')
 
 
 const bodyParser = require('body-parser')
-const { urlencoded } = require('express');
+const { urlencoded, query } = require('express');
 const { resolve, dirname } = require('path');
 const { clear } = require('console');
 const { send } = require('process');
@@ -57,7 +57,6 @@ app.post('/login', (req, res) => {
         })
     }
 })
-
 // 此处返回用户基本信息和头像  图片返回为路径
 app.get('/BasicMsg', (req, res) => {
     let sql_avatar = 'select path from avatar where id=1'
@@ -107,7 +106,6 @@ app.get('/blogs/Image', (req, res) => {
         res.send('没有此图片')
     })
 })
-
 // 请求blogs初始化
 app.get('/blogs/init', (req, res) => {
     const sql_select = 'select * from blogs order by id desc'
@@ -117,7 +115,7 @@ app.get('/blogs/init', (req, res) => {
             let left = []
             let right = []
             let head = []
-            let page=0
+            let page = 0
             for (let i = 0; i < result.length; i++) {
                 if (result[i].head) {
                     head.push(result[i])
@@ -126,7 +124,7 @@ app.get('/blogs/init', (req, res) => {
                     if (i % 2 == 0) left.push(result[i])
                     else {
                         right.push(result[i])
-                        page=result[i].id
+                        page = result[i].id
                     }
                 }
                 else if (right.length < 3 && head.length == 3) break
@@ -141,7 +139,6 @@ app.get('/blogs/init', (req, res) => {
         }
     })
 })
-
 // 后续请求blogs
 app.get('/blogs', (req, res) => {
     const sql_select = `select * from blogs where id < ${req.query.page} order by id desc limit 0,2`
@@ -157,7 +154,6 @@ app.get('/blogs', (req, res) => {
     })
 
 })
-
 // LookImg 随机图片请求 此处同 请求blogs 时所用文件夹
 app.get('/LookImg', (req, res) => {
     let left = []
@@ -166,7 +162,7 @@ app.get('/LookImg', (req, res) => {
     // 随机9张图片路径 分别追加
     let temp_switch = 0
     while (temp_switch < 9) {
-        let random = Math.ceil(Math.random() * 47)
+        let random = Math.ceil(Math.random() * 58)
         if (temp_switch <= 2) left.push({
             img: `img${random}.jpg`,
             size: size(path.join(__dirname, 'Look_lookImg_img', `img${random}.jpg`))
@@ -194,7 +190,6 @@ app.get('/lookImg/Image', (req, res) => {
         res.send('没有此图片')
     })
 })
-
 // Look 请求head部分
 app.get('/Look/head', (req, res) => {
     const sql_select = `select * from  look_head`
@@ -255,7 +250,7 @@ function setSql_select(num, filter, time) {
 }
 // Look anime detail请求
 app.get('/Look/anime/detail', (req, res) => {
-    let id=req.query.id
+    let id = req.query.id
     const sql_select = `select id,name,label,url,fullTime,detail from anime where id=${id}`
     let readDir = fs.readdirSync(__dirname + `/Look_anime_img/${id}`)
     db.query(sql_select, (err, result) => {
@@ -269,7 +264,6 @@ app.get('/Look/anime/detail', (req, res) => {
         }
     })
 })
-
 // Look anime 请求图片
 app.get('/Look/animeImg', (req, res) => {
     let Img_path = path.join(__dirname, 'Look_anime_img', req.query.path)
@@ -319,33 +313,100 @@ app.get('/Look/eigaImg', (req, res) => {
 })
 // header music 返回音乐列表
 app.get('/home/musicList', (req, res) => {
-    let readDir = fs.readdirSync(__dirname + '/home_music/')
-    let musicList=[]
-    for(let i=0;i<readDir.length;i++){
-        musicList.push(readDir[i].substring(0,readDir[i].length-4))
-    }
-    res.send(musicList)
+    let sql_select = 'select * from music_data where id in (select id from music_list)'
+    db.query(sql_select, (err, result) => {
+        for (let i = 0; i < result.length; i++) {
+            let name = result[i].name
+            result[i].name = name.substring(0, name.length - 4)
+        }
+        res.send(result)
+    })
 })
 // header music 请求音乐
 app.get('/home/music', (req, res) => {
     let music_path = path.join(__dirname, 'home_music', `${req.query.path}.mp3`)
     readFile(music_path).then((data) => {
+        // res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Accept-Ranges', 'bytes')
+        res.setHeader('Content-Length', data.length);
         res.send(data)
     }).catch((err) => {
         res.send('没有此music')
     })
 
 })
+// music list album
+app.get('/music/list', (req, res) => {
+    let sql_select = 'select * from music_album'
+    db.query(sql_select, (err, result) => {
+        if (err) console.log(err);
+        else {
+            res.send(result)
+        }
+    })
+})
+// music list cover.jpg
+app.get('/music/list/cover', (req, res) => {
+    let Img_path = path.join(__dirname, 'home_music', req.query.path, 'cover.jpg')
+    readFile(Img_path).then((data) => {
+        res.send(data)
+    }).catch((err) => {
+        res.send('没有此图片')
+    })
+})
+// music album msg
+app.get('/music/album', (req, res) => {
+    let sql_select = `select * from music_data where album = (select album from music_album where id = ${req.query.album})`
+    db.query(sql_select, (err, result) => {
+        if (err) console.log(err);
+        else {
+            for (let i = 0; i < result.length; i++) {
+                let name = result[i].name
+                result[i].name = name.substring(0, name.length - 4)
+            }
+            res.send(result)
+        }
+    })
+})
+// 添加/删除音乐后,更新
+app.post('/music/change', (req, res) => {
+    // 删除所有重新添加
+    let del = 'delete from music_list'
+    db.query(del, (err, result) => {
+        if (err) { res.send(err) }
+        else {
+            let add = []
+            try {
+                for (let i of req.body) {
+                    add.push(`(${i})`)
+                }
+            } catch (err) { res.send(err) }
+
+            let insert_into = 'insert into music_list values'
+            for (let i of add) {
+                insert_into = `${insert_into}${i},`
+            }
+            insert_into = insert_into.substring(0, insert_into.length - 1)
+            db.query(insert_into, (err, result) => {
+                if (err) {
+                    res.send(err)
+                } else {
+                    res.send('1')
+                }
+            })
+        }
+    })
+
+
+})
 // 接收上传封面图片,及标题内容等写入数据库
 app.post('/upload/cover', (req, res) => {
     const sql_insert1 = `insert into blogs values(${req.body.id},'${req.body.title}','${req.body.detail}','${req.body.path}','${req.body.time}',0)`
     const sql_insert2 = `insert into blogs_content values(${req.body.id},'${req.body.content}')`
-    let sql_err = 0
     let p1 = new Promise((resolve, reject) => {
         db.query(sql_insert1, (err, result) => {
             if (err) {
-                console.log(err);
-                sql_err = 1
+                reject(err)
             } else {
                 resolve(null)
             }
@@ -356,8 +417,7 @@ app.post('/upload/cover', (req, res) => {
     let p2 = new Promise((resolve, reject) => {
         db.query(sql_insert2, (err, result) => {
             if (err) {
-                console.log(err);
-                sql_err = 1
+                reject(err)
             } else {
                 resolve(null)
             }
@@ -366,27 +426,30 @@ app.post('/upload/cover', (req, res) => {
     }
     )
     Promise.all([p1, p2]).then(() => {
-        if (sql_err) {
-            const sql_del1 = `delete from blogs where id=${req.body.id}`
-            const sql_del2 = `delete from blogs_content where id=${req.body.id}`
-            db.query(sql_del1)
-            db.query(sql_del2)
-            res.send(0)
-        } else {
-            const path = `./blogs_img/${req.body.path}.png`;
-            const base64 = (req.body.img).replace(/^data:image\/\w+;base64,/, "");//去掉图片base64码前面部分data:image/png;base64
-            const dataBuffer = Buffer.from(base64, 'base64'); //把base64码转成buffer对
-            fs.writeFile(path, dataBuffer, (err) => {
-                if (err) {
-                    console.log('写入失败');
-                    res.send('0')
-                } else {
-                    console.log('写入成功');
-                    res.send("1")
-                }
-
-            })
-        }
+        const path = `./blogs_img/${req.body.path}.png`;
+        const base64 = (req.body.img).replace(/^data:image\/\w+;base64,/, "");//去掉图片base64码前面部分data:image/png;base64
+        const dataBuffer = Buffer.from(base64, 'base64'); //把base64码转成buffer
+        fs.writeFile(path, dataBuffer, (err) => {
+            if (err) {
+                const sql_del1 = `delete from blogs where id=${req.body.id}`
+                const sql_del2 = `delete from blogs_content where id=${req.body.id}`
+                db.query(sql_del1)
+                db.query(sql_del2)
+                console.log('写入失败');
+                res.send('3')
+            } else {
+                console.log('写入成功');
+                res.send("1")
+            }
+        })
+    }).catch((err) => {
+        const sql_del1 = `delete from blogs where id=${req.body.id}`
+        const sql_del2 = `delete from blogs_content where id=${req.body.id}`
+        db.query(sql_del1)
+        db.query(sql_del2)
+        console.log(err);
+        res.send('2')
+        
     })
 })
 //编写博客文章时 给予文章编号,即sql数据库最后ID + 1
@@ -422,7 +485,6 @@ app.post('/leaveMessage', (req, res) => {
         else res.send('1')
     })
 })
-
 // 请求 collect 资源信息
 app.get('/collect/download', (req, res) => {
     const sql_select = 'select * from collect'
@@ -435,8 +497,8 @@ app.get('/collect/download', (req, res) => {
 
 })
 // collect 资源 检索
-app.get('/collect/search', (req, res) => {    
-    let search = req.query.search    
+app.get('/collect/search', (req, res) => {
+    let search = req.query.search
     const sql_select = `select * from collect where name like '%${search}%'`
     db.query(sql_select, (err, result) => {
         if (err) console.log(err);
@@ -448,4 +510,5 @@ app.get('/collect/search', (req, res) => {
 app.listen(8088, () => {
     console.log('runing');
 })
+
 

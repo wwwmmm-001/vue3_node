@@ -112,8 +112,7 @@ export default {
                 outline: 0;
                 min-width: 100%;
                 max-width: 100%;
-                max-height: 20%;
-                max-height: 80%;
+                height: 10.5vw;
                 transition: all .18s;
 
                 overflow-y: scroll;
@@ -168,7 +167,7 @@ export default {
             }
 
             .btn {
-                margin-top: 1.35vw;
+                margin-top: 1.2vw;
                 width: 100%;
 
                 button {

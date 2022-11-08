@@ -338,7 +338,7 @@ export default {
 
         // 工具栏触发函数
         function ClickToolBar(e) {
-            let tool = e.target.parentNode.getAttribute('data-tool')
+            let tool = e.target.getAttribute('data-tool') || e.target.parentNode.getAttribute('data-tool')
             if (tool == 'left' || tool == 'right') {
                 ClickTool(undefined, tool)
             }
@@ -592,7 +592,7 @@ export default {
         bottom: 6%;
         transform: translateX(-50%);
         z-index: 99;
-        background-color: rgba(225, 225, 225, .78);
+        background-color: rgba(235, 235, 235, .5);
         border-radius: 20px;
         padding: 0 .85vw;
 
@@ -601,6 +601,21 @@ export default {
             color: rgba(0, 0, 0, .85);
             padding: .4vw .6vw;
         }
+        i{
+            transition: all .05s;
+        }
+        i:hover{
+            background-color: rgba(75, 75, 75, 0.6);
+            color: rgb(245, 245, 245);
+            border-radius: 2px;
+        }
+        i:first-child:hover{
+            border-radius: 5px 0 0 5px;
+        }
+        i:last-child:hover{
+            border-radius: 0 5px 5px 0;
+        }
+
     }
 
     .location {

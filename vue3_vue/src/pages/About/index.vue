@@ -49,10 +49,19 @@
                 <div class="three">
                     <h3>项目经验</h3>
                     &nbsp;&nbsp;&nbsp;&nbsp;<strong>使用Vue2</strong> 配合bilibili尚硅谷视频完成 <strong>尚品汇</strong> 前端部分 <br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<strong>使用Vue3</strong> 配合nodejs-express, mysql, element plus, iconfont, swiper,
-                    axios, vue3-quill, v-lazy <strong>搭建本网站</strong><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<strong>使用Vue3</strong>(vuex+router) 搭建<strong>本网站</strong>：<br>
+                    <span class="three_detail">
+                        <p>1. 后端：node</p>
+                        <p>2. 数据库：mysql</p>
+                        <p>3. 图标：element-plus,iconfont</p>
+                        <p>4. 轮播图：swiper</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;ajax：axios</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;文本编辑器：vue3-quill</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;图片懒加载：vue-lazyload</p>
+                    </span>
+                    <br>
                 </div>
-                <li>                    
+                <li>
                     <hr><br>
                     <div class="four">
                         <a href="https://github.com/wwwmmm-001/vue3_node" target="_blank">源码</a>
@@ -64,9 +73,11 @@
         <div class="web">
             <h1>注意</h1><br>
             <div class="header_">
-                <img src="./images/music.png" alt="">
+                <img src="./images/header.png" alt="">
                 <p>初始化时,切换歌曲不能自动播放,需要先点击一次播放<br>
-                有时切换歌曲后点击播放按钮无效, 因为判断src资源加载完成返回后才能播放(这里播放歌曲是等待资源加载完成)</p>
+                    有时切换歌曲后点击播放按钮无效, 因为判断src资源加载完成返回后才能播放(这里播放歌曲是等待资源加载完成)</p><br><br>
+                <img src="./images/music.png" alt="">
+                <p>这里使用了两个audio标签,左边导航区域音量可以控制两个,列表添加或删除音乐后会在该组件onunmounted发出请求,替换数据库数据</p>
             </div>
             <div class="home_">
                 <img src="./images/home.png" alt="">
@@ -101,10 +112,11 @@ export default {
 .About {
     width: 100%;
     padding-top: 2vw;
-    background-color: rgb(250, 250, 250);    
+    background-color: rgb(250, 250, 250);
     min-height: 100vh;
     box-sizing: border-box;
     height: 110%;
+
     .detail {
         box-shadow: 0 0 3px 1px rgb(161, 147, 147);
         background-color: rgb(240, 240, 240);
@@ -116,6 +128,7 @@ export default {
         font-size: .9vw;
         padding: 1vw 1vw 3vw 1vw;
         height: 110%;
+
         strong {
             font-size: .85vw;
             font-weight: 550;
@@ -161,19 +174,37 @@ export default {
 
         .three {
             animation: oneInit 2s;
+
+            .three_detail {
+                display: block;
+                padding-left: 2vw;
+
+                p {
+                    font-weight: 700;
+                    color: rgb(102, 102, 102);
+                    display: block;
+                    line-height: 1.2vw;
+                    padding: 0;
+                    margin: 0;
+                }
+            }
         }
-        .four{
-            animation: twoInit 2s;            
+
+        .four {
+            animation: twoInit 2s;
             font-size: 1.2vw;
             font-weight: 700;
-            a{
+
+            a {
                 color: rgba(0, 0, 0, 0.6);
                 transition: all .2s;
             }
-            a:hover{
+
+            a:hover {
                 color: rgb(45, 74, 238);
             }
         }
+
         @keyframes oneInit {
             from {
                 opacity: 0;
@@ -198,7 +229,8 @@ export default {
 
         }
     }
-    .web{
+
+    .web {
         box-shadow: 0 0 3px 1px rgb(161, 147, 147);
         box-sizing: border-box;
         padding: 1vw;
@@ -206,27 +238,33 @@ export default {
         margin: 0 auto;
         margin-top: 3vw;
         text-align: center;
-        .header_{
-            
+
+        .header_ {
+
             margin-bottom: 5vw;
-            img{
+
+            img {
                 display: inline-block;
                 max-height: 40vw;
                 vertical-align: middle;
             }
-            p{
+
+            p {
                 font-size: .9vw;
                 width: 40%;
                 display: inline-block;
             }
         }
-        .home_{
+
+        .home_ {
             text-align: center;
             margin-bottom: 5vw;
         }
-        .anime_{
+
+        .anime_ {
             margin-top: 5vw;
-            img{
+
+            img {
                 max-width: 80%;
             }
         }
